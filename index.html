@@ -1143,13 +1143,13 @@
     // ===== TINDER SWIPE LOGIC =====
     function initTinderSwipe() {
       const deck = document.getElementById('programDeck');
+      if (!deck) return;
       const allCards = Array.from(deck.querySelectorAll('.program-deck-card'));
       let cards = [...allCards];
       let swipedCards = [];
       const prevBtn = document.getElementById('deckPrev');
       const nextBtn = document.getElementById('deckNext');
 
-      // Modal Elements (Reusing existing modal logic)
       const modal = document.getElementById('courseModal');
       const modalBody = document.getElementById('modalBody');
       const modalClose = document.getElementById('modalClose');
@@ -1191,163 +1191,155 @@
             card.style.pointerEvents = 'none';
           }
         });
-        function initCard(card) {
-          let startX = 0, startY = 0, pX = 0, pY = 0;
-          let isDragging = false;
-          let rafId = null;
+      }
 
-          function updateTransform() {
-            if (!isDragging) return;
-            const rotate = pX * 0.05;
-            card.style.transform = `translate3d(${pX}px, ${pY}px, 0) rotate(${rotate}deg)`;
-            rafId = requestAnimationFrame(updateTransform);
-          }
+      function initCard(card) {
+        let startX = 0, startY = 0, pX = 0, pY = 0;
+        let isDragging = false;
+        let rafId = null;
 
-          card.onpointerdown = (e) => {
-            if (card !== cards[cards.length - 1]) return;
-            isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
-            card.classList.add('moving');
-            card.setPointerCapture(e.pointerId);
-            card.style.transition = 'none';
-            rafId = requestAnimationFrame(updateTransform);
-          };
-
-          card.onpointermove = (e) => {
-            if (!isDragging) return;
-            pX = e.clientX - startX;
-            pY = e.clientY - startY;
-          };
-
-          card.onpointerup = (e) => {
-            if (!isDragging) return;
-            isDragging = false;
-            cancelAnimationFrame(rafId);
-            card.classList.remove('moving');
-            card.releasePointerCapture(e.pointerId);
-
-            if (Math.abs(pX) > 100) {
-              swipeCard(card, pX > 0 ? 1 : -1);
-            } else {
-              card.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-              card.style.transform = ''; // snap back
-            }
-            pX = 0; pY = 0;
-          };
+        function updateTransform() {
+          if (!isDragging) return;
+          const rotate = pX * 0.05;
+          card.style.transform = `translate3d(${pX}px, ${pY}px, 0) rotate(${rotate}deg)`;
+          rafId = requestAnimationFrame(updateTransform);
         }
 
-        function swipeCard(card, direction) {
-          const screenW = window.innerWidth;
-          card.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
-          card.style.transform = `translate3d(${direction * screenW}px, 0, 0) rotate(${direction * 30}deg)`;
-          card.style.opacity = '0';
+        card.onpointerdown = (e) => {
+          if (card !== cards[cards.length - 1]) return;
+          isDragging = true;
+          startX = e.clientX;
+          startY = e.clientY;
+          card.classList.add('moving');
+          card.setPointerCapture(e.pointerId);
+          card.style.transition = 'none';
+          rafId = requestAnimationFrame(updateTransform);
+        };
 
-          const movedCard = cards.pop();
-          swipedCards.push(movedCard);
+        card.onpointermove = (e) => {
+          if (!isDragging) return;
+          pX = e.clientX - startX;
+          pY = e.clientY - startY;
+        };
 
-          updateCards(); // Elevate next background card
+        card.onpointerup = (e) => {
+          if (!isDragging) return;
+          isDragging = false;
+          cancelAnimationFrame(rafId);
+          card.classList.remove('moving');
+          card.releasePointerCapture(e.pointerId);
 
-          if (cards.length === 0) {
-            setTimeout(() => {
-              cards = [...allCards];
-              swipedCards = [];
-              cards.forEach(c => {
-                c.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease';
-                c.style.opacity = '';
-              });
-              updateCards();
-            }, 600); // Faster reset
+          if (Math.abs(pX) > 100) {
+            swipeCard(card, pX > 0 ? 1 : -1);
+          } else {
+            card.style.transition = 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            card.style.transform = ''; // snap back
           }
-        }
+          pX = 0; pY = 0;
+        };
+      }
 
-        function openModal(courseKey) {
-          const data = courseData[courseKey];
-          if (!data) return;
-          modalBody.innerHTML = `
+      function swipeCard(card, direction) {
+        const screenW = window.innerWidth;
+        card.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
+        card.style.transform = `translate3d(${direction * screenW}px, 0, 0) rotate(${direction * 30}deg)`;
+        card.style.opacity = '0';
+
+        const movedCard = cards.pop();
+        swipedCards.push(movedCard);
+
+        updateCards();
+
+        if (cards.length === 0) {
+          setTimeout(() => {
+            cards = [...allCards];
+            swipedCards = [];
+            cards.forEach(c => {
+              c.style.transition = 'transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.6s ease';
+              c.style.opacity = '';
+            });
+            updateCards();
+          }, 600);
+        }
+      }
+
+      function openModal(courseKey) {
+        const data = courseData[courseKey];
+        if (!data) return;
+        modalBody.innerHTML = `
           <h2>${data.title}</h2>
           <p>${data.description}</p>
           <ul>
             ${data.features.map(f => `<li><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>${f}</li>`).join('')}
           </ul>
         `;
-          modal.classList.add('active');
-          document.body.style.overflow = 'hidden';
-        }
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
 
-        allCards.forEach(card => {
-          initCard(card);
-          card.addEventListener('click', (e) => {
-            // If it's a short click (not a swipe), open the modal
-            if (Math.abs(pX) < 10) {
-              openModal(card.getAttribute('data-course'));
+      allCards.forEach(card => {
+        initCard(card);
+        card.addEventListener('click', () => {
+          openModal(card.getAttribute('data-course'));
+        });
+      });
+
+      prevBtn.onclick = () => {
+        if (swipedCards.length > 0) {
+          const card = swipedCards.pop();
+          cards.push(card);
+          card.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
+          updateCards();
+        }
+      };
+
+      nextBtn.onclick = () => {
+        if (cards.length > 0) swipeCard(cards[cards.length - 1], 1);
+      };
+
+      modalClose.onclick = () => { modal.classList.remove('active'); document.body.style.overflow = ''; };
+      modalOverlay.onclick = () => { modal.classList.remove('active'); document.body.style.overflow = ''; };
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { modal.classList.remove('active'); document.body.style.overflow = ''; }
+      });
+
+      updateCards();
+    }
+    initTinderSwipe();
+
+    function initGalleryReel() {
+      const reel = document.getElementById('galleryReel');
+      if (!reel) return;
+      const items = document.querySelectorAll('.gallery-item');
+      const videoModal = document.getElementById('videoModal');
+      const modalVideo = document.getElementById('modalVideo');
+      const videoModalClose = document.getElementById('videoModalClose');
+      const videoModalOverlay = document.getElementById('videoModalOverlay');
+
+      items.forEach(item => {
+        const video = item.querySelector('video');
+        if (video) {
+          item.addEventListener('mouseenter', () => {
+            if (window.matchMedia('(hover: hover)').matches) {
+              video.muted = true;
+              video.play().catch(() => { });
             }
           });
-        });
-
-        prevBtn.onclick = () => {
-          if (swipedCards.length > 0) {
-            const card = swipedCards.pop();
-            cards.push(card);
-            card.style.transition = 'transform 0.5s ease-out, opacity 0.5s';
-            updateCards();
-          }
-        };
-
-        nextBtn.onclick = () => {
-          if (cards.length > 0) swipeCard(cards[cards.length - 1], 1);
-        };
-
-        modalClose.onclick = () => { modal.classList.remove('active'); document.body.style.overflow = ''; };
-        modalOverlay.onclick = () => { modal.classList.remove('active'); document.body.style.overflow = ''; };
-
-        document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') { modal.classList.remove('active'); document.body.style.overflow = ''; }
-        });
-
-        updateCards();
-      }
-      initTinderSwipe();
-
-      function initGalleryReel() {
-        const reel = document.getElementById('galleryReel');
-        if (!reel) return;
-        const items = document.querySelectorAll('.gallery-item');
-
-        // Removed auto-scroll logic for better performance as requested.
-        // Horizontal scroll is now purely user-driven (manual swipe).
-
-        const videoModal = document.getElementById('videoModal');
-        const modalVideo = document.getElementById('modalVideo');
-        const videoModalClose = document.getElementById('videoModalClose');
-        const videoModalOverlay = document.getElementById('videoModalOverlay');
-
-        items.forEach(item => {
-          const video = item.querySelector('video');
-          if (video) {
-            // Preview logic for non-touch
-            item.addEventListener('mouseenter', () => {
-              if (window.matchMedia('(hover: hover)').matches) {
-                video.muted = true;
-                video.play().catch(() => { });
-              }
-            });
-            item.addEventListener('mouseleave', () => {
-              if (window.matchMedia('(hover: hover)').matches) {
-                video.pause();
-              }
-            });
-
-            // Click/Touch for full screen
-            item.addEventListener('click', () => {
-              modalVideo.src = video.src;
-              modalVideo.currentTime = video.currentTime;
-              videoModal.classList.add('active');
-              modalVideo.play();
-              document.body.style.overflow = 'hidden';
-            });
-          }
-        });
+          item.addEventListener('mouseleave', () => {
+            if (window.matchMedia('(hover: hover)').matches) {
+              video.pause();
+            }
+          });
+          item.addEventListener('click', () => {
+            modalVideo.src = video.src;
+            modalVideo.currentTime = video.currentTime;
+            videoModal.classList.add('active');
+            modalVideo.play();
+            document.body.style.overflow = 'hidden';
+          });
+        }
+      });
 
       function closeVideoModal() {
         videoModal.classList.remove('active');
@@ -1360,9 +1352,6 @@
       videoModalOverlay.onclick = closeVideoModal;
     }
     initGalleryReel();
-
   </script>
-
 </body>
-
 </html>
