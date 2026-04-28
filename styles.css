@@ -39,6 +39,7 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 90px;
+  overflow-x: hidden;
 }
 
 body {
@@ -50,6 +51,8 @@ body {
     var(--bg);
   line-height: 1.65;
   overflow-x: hidden;
+  position: relative;
+  width: 100%;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -624,6 +627,7 @@ ul {
 .programs {
   padding: var(--section-space) 0;
   background: var(--bg-soft);
+  overflow: hidden;
 }
 
 .programs-deck-container {
@@ -2005,16 +2009,14 @@ ul {
   }
 
   .hero-image {
-    width: 100vw;
-    margin-left: calc(-50vw + 50%);
-    margin-right: calc(-50vw + 50%);
+    width: 100%;
     margin-top: 30px;
     margin-bottom: 30px;
   }
 
   .hero-image-wrapper {
-    border-radius: 0;
-    box-shadow: none;
+    border-radius: 24px;
+    box-shadow: var(--shadow-md);
   }
 
   .hero-floating-badge {
