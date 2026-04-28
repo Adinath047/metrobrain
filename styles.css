@@ -1147,34 +1147,40 @@ ul {
 
 /* Use negative margins to break out of container on mobile for full-bleed scroll */
 .gallery-reel-wrapper {
-  overflow: hidden;
+  overflow: visible;
 }
 
 .gallery-reel {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding: 40px 20px;
-  /* Extend padding on the sides so first/last cards don't hug the edge */
-  margin: 0 -20px;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  /* Firefox */
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  /* Stop pull-to-refresh fighting the horizontal scroll */
-  overscroll-behavior-x: contain;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 40px 0;
+}
+
+@media (max-width: 1200px) {
+  .gallery-reel {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 991px) {
+  .gallery-reel {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .gallery-reel {
+    grid-template-columns: 1fr;
+  }
 }
 
 .gallery-reel::-webkit-scrollbar {
   display: none;
-  /* Chrome, Safari, Opera */
 }
 
 .gallery-item {
-  flex: 0 0 280px;
+  width: 100%;
   height: 420px;
   background: #000;
   border-radius: var(--radius-lg);
@@ -2087,10 +2093,10 @@ ul {
     padding: 28px 0;
   }
 
-  /* Gallery full-bleed wrapper */
+  /* Gallery grid padding adjustment */
   .gallery-reel {
-    padding: 28px 12px;
-    margin: 0 -12px;
-    gap: 12px;
+    padding: 28px 0;
+    margin: 0;
+    gap: 16px;
   }
 }
