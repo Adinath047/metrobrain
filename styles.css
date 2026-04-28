@@ -1128,6 +1128,7 @@ ul {
   background: #fff;
   position: relative;
   overflow: hidden;
+  margin-top: 40px;
 }
 
 .gallery::before {
