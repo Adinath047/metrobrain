@@ -1827,7 +1827,9 @@ ul {
   }
 
   .hero-title {
-    font-size: 2.4rem;
+    font-size: 2.2rem;
+    line-height: 1.1;
+    letter-spacing: -0.04em;
   }
 
   .hero::before {
